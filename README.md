@@ -18,10 +18,10 @@ Written in C#.
 - Uses the Task Parallel Library `async`/`await` constructs for efficient, asynchronous I/O without blocking the UI.
 
 # Instructions
-- Configure all SMTP connection settings in the [`system.net/mailSettings`](http://msdn.microsoft.com/en-us/library/ms164240%28v=vs.110%29.aspx) configuration section of the `App.config` file before building. At runtime, the settings should be configured in the `SMTPTester.exe.config` file. Settings that are configured in the `App.config` file are grayed out in the UI.
+Configure all SMTP connection settings in the [`system.net/mailSettings`](http://msdn.microsoft.com/en-us/library/ms164240%28v=vs.110%29.aspx) configuration section of the `App.config` file before building. At runtime, the settings should be configured in the `SMTPTester.exe.config` file before launching the app. Settings that are configured in the config file are grayed out in the UI.
 
 ##### Testing SMTP Connections
-- To test an SMTP connection without sending mail, use the `Test Connection` button.
+To test an SMTP connection without sending mail, use the `Test Connection` button.
 
 ##### Testing Mail Delivery 
-- To test sending an email, fill out the available form fields and use the `Send Email` button.
+To test sending an email, fill out the available form fields and use the `Send Email` button.
