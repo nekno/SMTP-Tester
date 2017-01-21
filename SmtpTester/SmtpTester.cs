@@ -10,15 +10,15 @@ namespace SmtpTester
 {
 	public partial class SmtpTester : Form
 	{
-		SmtpTesterLib smtpTester = new SmtpTesterLib();
+		SmtpTesterClient smtpClient = new SmtpTesterClient();
 		bool IsErrorCondition { get; set; }
 		
 		public SmtpTester()
 		{
 			InitializeComponent();
 
-			smtpTester.LogOutput += AppendOutput;
-			smtpTester.ResponseReceived += SetErrorDisplay;
+			smtpClient.LogOutput += AppendOutput;
+			smtpClient.ResponseReceived += SetErrorDisplay;
 		}
 
 		protected void SmtpTester_Load(object sender, EventArgs e)
@@ -50,7 +50,7 @@ namespace SmtpTester
 				ClearErrorDisplay();
 				ShowLoading(true);
 
-				await smtpTester.TestConnection(server, port, chkEnableTLS.Checked);
+				await smtpClient.TestConnection(server, port, chkEnableTLS.Checked);
 			}
 			catch (Exception ex)
 			{
@@ -74,7 +74,7 @@ namespace SmtpTester
 				ClearErrorDisplay();
 				ShowLoading(true);
 
-				await smtpTester.TestEmail(to, cc, bcc, txtSubject.Text, txtBody.Text);
+				await smtpClient.TestEmail(to, cc, bcc, txtSubject.Text, txtBody.Text);
 
 				AppendOutput(String.Format("Message sent to {0} {1} {2}.", to, cc, bcc));
 				SetErrorDisplay(false);

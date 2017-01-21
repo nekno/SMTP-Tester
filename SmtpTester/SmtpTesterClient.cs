@@ -14,14 +14,14 @@ namespace SmtpTester
 	public delegate void LogOutputHandler(string message);
 	public delegate void ResponseHandler(bool isError);
 
-	public class SmtpTesterLib
+	public class SmtpTesterClient
 	{
 		public event LogOutputHandler LogOutput;
 		public event ResponseHandler ResponseReceived;
 
 		AggregateException ServerException { get; set; }
 
-		public SmtpTesterLib() {
+		public SmtpTesterClient() {
 			// Needed for showing remote SSL certificate errors with SmtpClient. TcpClient is passed its own callback handler.
 			ServicePointManager.ServerCertificateValidationCallback += new RemoteCertificateValidationCallback(ValidateRemoteCertificate);
 		}
