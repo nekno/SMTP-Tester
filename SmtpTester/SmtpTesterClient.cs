@@ -7,6 +7,7 @@ using System.Net.Security;
 using System.Net.Sockets;
 using System.Security.Authentication;
 using System.Security.Cryptography.X509Certificates;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace SmtpTester
@@ -50,33 +51,23 @@ namespace SmtpTester
 							// Disable SSLv3 to avoid POODLE
 							// Should disable TLS 1.0 to avoid BEAST, but need it to support servers prior to Windows Server 2008 R2 and OpenSSL 1.0.1
 							await sslStream.AuthenticateAsClientAsync(server, null, SslProtocols.Tls | SslProtocols.Tls11 | SslProtocols.Tls12, true);
-							FireLogOutput(String.Format("Authentication negotiated:{0}" + 
-								"\tSSL protocol: {1}{0}" +
-								"\tCipher algo: {2}{0}" +
-								"\tCipher strength: {3}{0}" +
-								"\tHash algo: {4}{0}" + 
-								"\tHash strength: {5}{0}" + 
-								"\tIs authenticated: {6}{0}" + 
-								"\tIs encrypted: {7}{0}" + 
-								"\tIs mutually authenticated: {8}{0}" + 
-								"\tIs signed: {9}{0}" + 
-								"\tKey exchange algo: {10}{0}" + 
-								"\tKey exchange strength: {11}{0}" +
-								"Remote cert: {0}{12}", 
-								System.Environment.NewLine,
-								sslStream.SslProtocol,
-								sslStream.CipherAlgorithm,
-								sslStream.CipherStrength,
-								sslStream.HashAlgorithm,
-								sslStream.HashStrength,
-								sslStream.IsAuthenticated,
-								sslStream.IsEncrypted,
-								sslStream.IsMutuallyAuthenticated,
-								sslStream.IsSigned,
-								sslStream.KeyExchangeAlgorithm,
-								sslStream.KeyExchangeStrength,
-								sslStream.RemoteCertificate.ToString(true)
-							));
+							
+							var sslOutput = new StringBuilder();
+							sslOutput.AppendLine("Authentication negotiated:");
+							sslOutput.AppendLine(String.Format("\tSSL protocol: {0}", sslStream.SslProtocol));
+							sslOutput.AppendLine(String.Format("\tCipher algo: {0}", sslStream.CipherAlgorithm));
+							sslOutput.AppendLine(String.Format("\tCipher strength: {0}", sslStream.CipherStrength));
+							sslOutput.AppendLine(String.Format("\tHash algo: {0}", sslStream.HashAlgorithm)); 
+							sslOutput.AppendLine(String.Format("\tHash strength: {0}", sslStream.HashStrength)); 
+							sslOutput.AppendLine(String.Format("\tIs authenticated: {0}", sslStream.IsAuthenticated)); 
+							sslOutput.AppendLine(String.Format("\tIs encrypted: {0}", sslStream.IsEncrypted)); 
+							sslOutput.AppendLine(String.Format("\tIs mutually authenticated: {0}", sslStream.IsMutuallyAuthenticated)); 
+							sslOutput.AppendLine(String.Format("\tIs signed: {0}", sslStream.IsSigned)); 
+							sslOutput.AppendLine(String.Format("\tKey exchange algo: {0}", sslStream.KeyExchangeAlgorithm)); 
+							sslOutput.AppendLine(String.Format("\tKey exchange strength: {0}", sslStream.KeyExchangeStrength));
+							sslOutput.AppendLine("Remote cert:");
+							sslOutput.AppendLine(sslStream.RemoteCertificate.ToString(true));
+							FireLogOutput(sslOutput.ToString());
 
 							using (var sslReader = new StreamReader(sslStream))
 							using (var sslWriter = new StreamWriter(sslStream) { AutoFlush = true }) {
@@ -138,7 +129,7 @@ namespace SmtpTester
 			if (response == null || !(response.StartsWith("2") || response.StartsWith("3"))) {
 				isError = true;
 				List<Exception> exceptions = new List<Exception>(ServerException.InnerExceptions);
-				exceptions.Add(new Exception(response));
+				exceptions.Add(new SmtpResponseException(response));
 				ServerException = new AggregateException("The SMTP server responded with one or more errors.", exceptions);
 			}
 
@@ -151,15 +142,19 @@ namespace SmtpTester
 
 		protected bool ValidateRemoteCertificate(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors policyErrors) {
 			if (policyErrors != SslPolicyErrors.None) {
-				FireResponseReceived(true);
-				FireLogOutput(String.Format("Certificate policy errors: {0}", policyErrors));
+				var output = new StringBuilder();
+				output.AppendLine(String.Format("Certificate policy errors: {0}", policyErrors));
+
 				foreach (var chainElement in chain.ChainElements) {
-					FireLogOutput(String.Format("Certificate chain cert: {0}", chainElement.Certificate.ToString(true)));
-					FireLogOutput(String.Format("Certificate chain info: {0}", chainElement.Information));
+					output.AppendLine(String.Format("Certificate chain cert: {0}", chainElement.Certificate.ToString(true)));
+					output.AppendLine(String.Format("Certificate chain info: {0}", chainElement.Information));
 					foreach (var certStatus in chainElement.ChainElementStatus) {
-						FireLogOutput(String.Format("Certificate chain status: {0}", certStatus.StatusInformation));
+						output.AppendLine(String.Format("Certificate chain status: {0}", certStatus.StatusInformation));
 					}
 				}
+
+				FireResponseReceived(true);
+				FireLogOutput(output.ToString());
 			}
 
 			return true; // allow errors to see what other errors arise, otherwise return (policyErrors == SslPolicyErrors.None);
@@ -176,5 +171,10 @@ namespace SmtpTester
 				ResponseReceived(isError);
 			}
 		}
+	}
+
+	public class SmtpResponseException : Exception
+	{
+		public SmtpResponseException(string message) : base(message) { }
 	}
 }
