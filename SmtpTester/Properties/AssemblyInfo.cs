@@ -6,11 +6,11 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("SMTP Tester")]
-[assembly: AssemblyDescription("A simple GUI client for testing SMTP connections with or without TLS/SSL, mail delivery, and the .Net system.net/mailSettings configuration section for use with the built-in SmtpClient in .Net.")]
+[assembly: AssemblyDescription("A simple client for testing SMTP connections with or without TLS/SSL, mail delivery, and the .Net system.net/mailSettings configuration section for use with the built-in SmtpClient in .Net.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("SMTP Tester")]
-[assembly: AssemblyCopyright("Copyright © 2014 nekno")]
+[assembly: AssemblyCopyright("Copyright © 2014-2017 nekno")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -32,5 +32,5 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("0.1.0.0")]
-[assembly: AssemblyFileVersion("0.1.0.0")]
+[assembly: AssemblyVersion("0.2.0.0")]
+[assembly: AssemblyFileVersion("0.2.0.0")]
